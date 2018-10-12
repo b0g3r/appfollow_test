@@ -19,6 +19,16 @@ services:
     logging:
       <<: *logging
 
+  viewer:
+    build: ./permission_viewer
+    ports:
+      - "80:8000"
+    depends_on:
+    - mongo
+    - fetcher
+    logging:
+      <<: *logging
+
 volumes:
   mongodb:
     driver: local
