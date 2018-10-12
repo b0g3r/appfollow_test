@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 aiohttp = "==3.4.4"
+motor = "==2.0.0"
 
 [dev-packages]
 mypy = "==0.630"
