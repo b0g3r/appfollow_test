@@ -9,6 +9,7 @@ from typing import List, Dict, Union
 
 from aiohttp import ClientSession
 
+from permission_fetcher.pictures import save_picture
 
 BlockTyping = Dict[str, Union[str, List[str]]]
 
@@ -19,7 +20,7 @@ async def get_permissions(app_id: str, language: str) -> Dict[str, BlockTyping]:
     """
     raw_response = await request_app_data(app_id, language)
     permission_data = extract_permission_data(raw_response)
-    permissions = extract_permission_blocks(permission_data, language)
+    permissions = await extract_permission_blocks(permission_data, language)
     pprint.pprint(permissions)
     return permissions
 
@@ -63,7 +64,7 @@ def extract_permission_data(raw_response: str) -> List:
     return json.loads(json_payload)
 
 
-def extract_permission_blocks(permission_data: List, language: str) -> Dict[str, BlockTyping]:
+async def extract_permission_blocks(permission_data: List, language: str) -> Dict[str, BlockTyping]:
     """
     Извлекает из странного списка блоков разрешений структурированный словарь блоков
     """
@@ -77,10 +78,10 @@ def extract_permission_blocks(permission_data: List, language: str) -> Dict[str,
         for line in block:
             if len(line) > 2:
                 name = line[0]
-                pic_url = line[1][3][2]
+                picture = await save_picture(line[1][3][2])
                 permissions = [permission_line[1] for permission_line in line[2]]
                 if name not in blocks:
-                    blocks[name] = {'pic_url': pic_url, 'permissions': permissions}
+                    blocks[name] = {'picture': picture, 'permissions': permissions}
                 else:
                     blocks[name]['permissions'].extend(permissions)
             elif len(line) == 2:
