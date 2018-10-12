@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  mongo:
+    image: mongo:3.7.9
+    volumes:
+      - mongodb:/data/db
+    logging: &logging
+      driver: json-file
+
+  fetcher:
+    build: ./permission_fetcher
+    depends_on:
+      - mongo
+    volumes:
+      - pictures:/opt/pictures
+    logging:
+      <<: *logging
+
+volumes:
+  mongodb:
+    driver: local
+  pictures:
+    driver: local
