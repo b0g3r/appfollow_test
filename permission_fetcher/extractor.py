@@ -4,7 +4,6 @@
 import asyncio
 import re
 import json
-import pprint
 from typing import List, Dict, Union
 
 from aiohttp import ClientSession
@@ -21,7 +20,6 @@ async def get_permissions(app_id: str, language: str) -> Dict[str, BlockTyping]:
     raw_response = await request_app_data(app_id, language)
     permission_data = extract_permission_data(raw_response)
     permissions = await extract_permission_blocks(permission_data, language)
-    pprint.pprint(permissions)
     return permissions
 
 
