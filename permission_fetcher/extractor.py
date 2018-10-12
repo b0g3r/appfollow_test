@@ -4,7 +4,7 @@
 import asyncio
 import re
 import json
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 
 from aiohttp import ClientSession
 
@@ -13,12 +13,16 @@ from pictures import save_picture
 BlockTyping = Dict[str, Union[str, List[str]]]
 
 
-async def get_permissions(app_id: str, language: str) -> Dict[str, BlockTyping]:
+async def get_permissions(app_id: str, language: str) -> Optional[Dict[str, BlockTyping]]:
     """
     Возвращает словарь блоков разрешений по идентификатору приложения и языку
     """
     raw_response = await request_app_data(app_id, language)
     permission_data = extract_permission_data(raw_response)
+
+    if not permission_data:
+        return None
+
     permissions = await extract_permission_blocks(permission_data, language)
     return permissions
 
@@ -53,11 +57,13 @@ async def request_app_data(app_id: str, language: str) -> str:
             return await resp.text()
 
 
-def extract_permission_data(raw_response: str) -> List:
+def extract_permission_data(raw_response: str) -> Optional[List]:
     """
     Преобразует сырую строку ответа в список блоков разрешений
     """
     raw = re.findall(r'\"(\[.*\\n)\"', raw_response)
+    if not raw:
+        return None
     json_payload = raw[0].replace('\\n', '').replace('\\', '')
     return json.loads(json_payload)
 
@@ -88,12 +94,3 @@ async def extract_permission_blocks(permission_data: List, language: str) -> Dic
                 else:
                     blocks['Другое']['permissions'].append(line[1])
     return blocks
-
-
-if __name__ == '__main__':
-    asyncio.ensure_future(get_permissions('my.android.calc', 'ru'))
-    loop = asyncio.get_event_loop()
-    try:
-        loop.run_forever()
-    except Exception:
-        loop.close()

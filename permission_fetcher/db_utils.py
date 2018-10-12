@@ -17,8 +17,9 @@ async def permission_requests() -> AsyncIterable[Tuple[ObjectId, str, str]]:
     """
     Генератор, следящий за изменениями в коллекции и возвращающий данные запроса разрешений
     """
+    query = {'permissions': {'$exists': False}, 'error': {'$exists': False}}
     while True:
-        async for document in db.application_data.find({'permissions': {'$exists': False}}):
+        async for document in db.application_data.find(query):
             id_ = document['_id']
             application_id = document['application_id']
             language = document['language']
@@ -32,5 +33,12 @@ async def save_permission(id_: ObjectId, permissions: Dict):
     """
     await db.application_data.update_one(
         {'_id': id_},
-        {'$set': {'permissions': permissions, 'updated': datetime.utcnow()}}
+        {'$set': {'permissions': permissions}}
+    )
+
+
+async def set_error(id_: ObjectId):
+    await db.application_data.update_one(
+        {'_id': id_},
+        {'$set': {'error': True}}
     )
