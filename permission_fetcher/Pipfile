@@ -4,9 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-aiohttp = "*"
+aiohttp = "==3.4.4"
 
 [dev-packages]
+mypy = "==0.630"
+wemake-python-styleguide = "==0.2.0"
 
 [requires]
 python_version = "3.7"
