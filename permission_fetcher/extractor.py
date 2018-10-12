@@ -1,19 +1,17 @@
 """
 Модуль, выполняющий основную работу по экстракции и преобразованию данных из API GooglePlay
 """
-import asyncio
 import re
 import json
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Optional
 
 from aiohttp import ClientSession
 
 from pictures import save_picture
+from custom_types import BlockType, PermissionsType
 
-BlockTyping = Dict[str, Union[str, List[str]]]
 
-
-async def get_permissions(app_id: str, language: str) -> Optional[Dict[str, BlockTyping]]:
+async def get_permissions(app_id: str, language: str) -> Optional[Dict[str, BlockType]]:
     """
     Возвращает словарь блоков разрешений по идентификатору приложения и языку
     """
@@ -68,7 +66,7 @@ def extract_permission_data(raw_response: str) -> Optional[List]:
     return json.loads(json_payload)
 
 
-async def extract_permission_blocks(permission_data: List, language: str) -> Dict[str, BlockTyping]:
+async def extract_permission_blocks(permission_data: List, language: str) -> PermissionsType:
     """
     Извлекает из странного списка блоков разрешений структурированный словарь блоков
     """

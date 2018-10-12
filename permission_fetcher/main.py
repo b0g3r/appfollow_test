@@ -9,6 +9,7 @@ from db_utils import permission_requests, save_permission, set_error
 
 logging.basicConfig(level=logging.DEBUG)
 
+
 async def entry_point():
     """
     В цикле проходит по асинхронному итератору с запросами на получение разрешений

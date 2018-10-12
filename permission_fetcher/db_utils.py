@@ -3,11 +3,12 @@
 """
 from asyncio import sleep
 
-from datetime import datetime
-from typing import Tuple, AsyncIterable, Dict
+from typing import Tuple, AsyncIterable
 
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
+
+from custom_types import PermissionsType
 
 client = AsyncIOMotorClient('mongo')
 db = client.AppFollow
@@ -27,18 +28,21 @@ async def permission_requests() -> AsyncIterable[Tuple[ObjectId, str, str]]:
         await sleep(1)
 
 
-async def save_permission(id_: ObjectId, permissions: Dict):
+async def save_permission(id_: ObjectId, permissions: PermissionsType):
     """
     Добавляет разрешение приложения к запросу
     """
     await db.application_data.update_one(
         {'_id': id_},
-        {'$set': {'permissions': permissions}}
+        {'$set': {'permissions': permissions}},
     )
 
 
 async def set_error(id_: ObjectId):
+    """
+    Помечает запрос ошибочным
+    """
     await db.application_data.update_one(
         {'_id': id_},
-        {'$set': {'error': True}}
+        {'$set': {'error': True}},
     )
