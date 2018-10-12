@@ -8,7 +8,7 @@ from typing import List, Dict, Union
 
 from aiohttp import ClientSession
 
-from permission_fetcher.pictures import save_picture
+from pictures import save_picture
 
 BlockTyping = Dict[str, Union[str, List[str]]]
 
