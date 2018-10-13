@@ -71,24 +71,42 @@ async def extract_permission_blocks(permission_data: List, language: str) -> Per
     Извлекает из странного списка блоков разрешений структурированный словарь блоков
     """
     blocks: dict = {}
-    # TODO: нужен рефакторинг, сейчас найдено три блока: основные разрешения, другие, расширение
-    # других. Нужно разбить на три функции, видимо.
-    for block in permission_data:
-        # TODO: бывают пустые блоки
-        if not block:
-            continue
-        for line in block:
-            if len(line) > 2:
-                name = line[0]
-                picture = await save_picture(line[1][3][2])
-                permissions = [permission_line[1] for permission_line in line[2]]
-                if name not in blocks:
-                    blocks[name] = {'picture': picture, 'permissions': permissions}
-                else:
-                    blocks[name]['permissions'].extend(permissions)
-            elif len(line) == 2:
-                if language == 'en':
-                    blocks['Other']['permissions'].append(line[1])
-                else:
-                    blocks['Другое']['permissions'].append(line[1])
+    basic, other, *other_extension = permission_data
+    await _parse_basic_and_other(basic, other, blocks)
+    _parse_other_extension(other_extension, language, blocks)
     return blocks
+
+
+async def _parse_basic_and_other(basic: Optional[List], other: Optional[List], blocks: dict):
+    """
+    Парсит основной блок разрешений и блок "Другое". Оба могут прийти пустыми, но парсятся по
+    одной схеме
+    """
+    basic = basic or []
+    other = other or []
+    for line in basic + other:
+        if not line:
+            continue
+        name = line[0]
+        picture = await save_picture(line[1][3][2])
+        permissions = [permission_line[1] for permission_line in line[2]]
+        if name not in blocks:
+            blocks[name] = {'picture': picture, 'permissions': permissions}
+        else:
+            blocks[name]['permissions'].extend(permissions)
+
+
+def _parse_other_extension(other_extension: Optional[List], language: str, blocks: dict):
+    """
+    Парсит третий, опциональный элемент сырых данных -- расширение блока "Другое". Может
+    присутствовать при отсутствии первых двух блоков, поэтому необходимо прокидывать язык для
+    правильной вставки в итоговый словарь.
+    """
+    if not other_extension:
+        return
+
+    for line in other_extension[0]:
+        if language == 'en':
+            blocks['Other']['permissions'].append(line[1])
+        else:
+            blocks['Другое']['permissions'].append(line[1])
