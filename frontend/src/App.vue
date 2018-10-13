@@ -60,7 +60,7 @@
         this.errors = null
         this.permissions = null
         axios.post(
-          'http://localhost/permissions', {'url': this.url}
+          '/permissions', {'url': this.url}
         ).then(response => {
           if (response.status === 200) {
             this.permissions = response.data.permissions

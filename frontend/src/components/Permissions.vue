@@ -4,7 +4,7 @@
       <img
         height="20px"
         width="20px"
-        :src="`/static/${block.picture}`"
+        :src="`/static/pictures/${block.picture}`"
       >
       <span>{{ key }}</span>
       <ul v-for="permission in block.permissions">

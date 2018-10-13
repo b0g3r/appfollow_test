@@ -21,11 +21,20 @@ services:
 
   viewer:
     build: ./permission_viewer
-    ports:
-      - "80:8000"
     depends_on:
     - mongo
     - fetcher
+    logging:
+      <<: *logging
+
+  frontend:
+    build: ./frontend
+    ports:
+    - "80:80"
+    depends_on:
+    - viewer
+    volumes:
+    - pictures:/usr/share/nginx/html/static/pictures
     logging:
       <<: *logging
 
