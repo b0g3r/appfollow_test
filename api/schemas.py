@@ -14,7 +14,7 @@ class PermissionRequest(Schema):
     """
 
     application_id = fields.String(data_key='id', required=True, allow_none=False)
-    language = fields.String(data_key='hl', required=True, allow_none=False)
+    language = fields.String(data_key='hl', missing='en')
 
     @pre_load
     def parse_url(self, request_data: dict) -> dict:
