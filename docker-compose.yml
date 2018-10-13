@@ -11,7 +11,7 @@ services:
       driver: json-file
 
   fetcher:
-    build: ./permission_fetcher
+    build: ./fetcher
     depends_on:
       - mongo
     volumes:
@@ -20,7 +20,7 @@ services:
       <<: *logging
 
   viewer:
-    build: ./permission_viewer
+    build: ./api
     depends_on:
     - mongo
     - fetcher
