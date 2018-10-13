@@ -27,7 +27,7 @@ async def main_view(request: Request):
     if error:
         return web.json_response({'errors': {'url': ['invalid url']}}, status=400)
 
-    if permissions:
+    if permissions is not None:
         return web.json_response(permissions, status=200)
     else:
         return web.json_response({}, status=202)
