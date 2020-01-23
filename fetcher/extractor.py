@@ -3,12 +3,28 @@
 """
 import re
 import json
+import types
 from typing import List, Dict, Optional
 
 from aiohttp import ClientSession
 
 from pictures import save_picture
 from custom_types import BlockType, PermissionsType
+
+MAGIC_APP_STRING = r'[[["xdSrCf","[[null,[\"{0}\",7],[]]]",null,"vm96le:0|ww"]]]'
+
+PERMISSION_URL = 'https://play.google.com/_/PlayStoreUi/data/batchexecute'
+
+DEFAULT_REQUEST_PARAMS = types.MappingProxyType({
+    'f.sid': '7185783150060508621',
+    'bl': 'boq_playuiserver_20180827.08_p0',
+    'authuser': '',
+    'soc-app': '121',
+    'soc-platform': '1',
+    'soc-device': '1',
+    '_reqid': '202915',
+    'rt': 'c',
+})
 
 
 async def get_permissions(app_id: str, language: str) -> Optional[Dict[str, BlockType]]:
@@ -21,36 +37,27 @@ async def get_permissions(app_id: str, language: str) -> Optional[Dict[str, Bloc
     if not permission_data:
         return None
 
-    permissions = await extract_permission_blocks(permission_data, language)
-    return permissions
+    return await extract_permission_blocks(permission_data, language)
 
 
 async def request_app_data(app_id: str, language: str) -> str:
     """
     Возвращает запрошенные данные о приложении через внутреннее API GooglePlay Store
     """
-    params = {
-        'f.sid': '7185783150060508621',
-        'bl': 'boq_playuiserver_20180827.08_p0',
-        'hl': language,
-        'authuser': '',
-        'soc-app': '121',
-        'soc-platform': '1',
-        'soc-device': '1',
-        '_reqid': '202915',
-        'rt': 'c',
-    }
-    post_data = {
-        'f.req': r'[[["xdSrCf","[[null,[\"{0}\",7],[]]]",null,"vm96le:0|ww"]]]'.format(app_id),
+    app_id_data = {
+        'f.req': MAGIC_APP_STRING.format(app_id),
         '': '',
+    }
+    search_params = {
+        **DEFAULT_REQUEST_PARAMS,
+        'hl': language,
     }
 
     async with ClientSession() as session:
-        # TODO: нужен рефакторинг этого неприятного переноса
         async with session.post(
-                url='https://play.google.com/_/PlayStoreUi/data/batchexecute',
-                params=params,
-                data=post_data,
+            url=PERMISSION_URL,
+            params=search_params,
+            data=app_id_data,
         ) as resp:
             return await resp.text()
 
@@ -62,7 +69,7 @@ def extract_permission_data(raw_response: str) -> Optional[List]:
     raw = re.findall(r'\"(\[.*\\n)\"', raw_response)
     if not raw:
         return None
-    json_payload = raw[0].replace('\\n', '').replace('\\', '')
+    json_payload = raw[0].replace(r'\n', '').replace('\\', '')
     return json.loads(json_payload)
 
 
