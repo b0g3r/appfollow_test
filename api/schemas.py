@@ -17,7 +17,7 @@ class PermissionRequest(Schema):
     language = fields.String(data_key='hl', missing='en')
 
     @pre_load
-    def parse_url(self, request_data: dict) -> dict:
+    def parse_url(self, request_data: dict, **kwargs) -> dict:
         """
         Разбирает url на параметры, необходимые для запроса
         """
