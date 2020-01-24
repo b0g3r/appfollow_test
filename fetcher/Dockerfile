@@ -4,6 +4,8 @@ MAINTAINER b0g3r
 WORKDIR /opt/project
 
 RUN groupadd -r pythonuser && useradd -r -g pythonuser pythonuser
+RUN mkdir /opt/pictures && chown pythonuser:pythonuser /opt/pictures
+VOLUME /opt/pictures
 
 ADD poetry.lock pyproject.toml /opt/project/
 
