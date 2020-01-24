@@ -19,7 +19,7 @@ services:
     logging:
       <<: *logging
 
-  viewer:
+  api:
     build: ./api
     depends_on:
     - mongo
@@ -32,9 +32,9 @@ services:
     ports:
     - "80:80"
     depends_on:
-    - viewer
+    - api
     volumes:
-    - pictures:/usr/share/nginx/html/static/pictures
+    - pictures:/usr/share/nginx/html/static/pictures:ro
     logging:
       <<: *logging
 
