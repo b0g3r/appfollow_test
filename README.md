@@ -1,35 +1,36 @@
 # appfollow_test
-Тестовое задание для [AppFollow](https://appfollow.io) на python-разработчика. Распространяется по лицензии MIT
+Test assignment for [AppFollow](https://appfollow.io) as Python-developer. MIT Licence
 
-## Запуск
-Необходим docker>=17.06 и docker-compose>=3.3
-`docker-compose up` и доступен по `http://localhost`
+## How to launch
+You need a docker>=17.06 and docker-compose>=3.3
 
-## Демо
-[*однако однажды оно станет чем-то другим](http://194.182.84.137/)
+Type `docker-compose up` in project directory and project will be available at `http://localhost`
 
-## mypy, flake8
-Все питоновские сервисы содержат в себе в качестве дев-зависимостей mypy и wemake-python-styleguide (flake8). Для их 
-запуска нужно сделать что-нибудь эдакое:
+## Checkers
+All python sub-projects containts mypy and wemake-python-styleguide (flake8) as dev-dependencies. For running checks
+you can use commands
 
 `mypy .`
 
+and
+
 `flake8`
 
-Чтобы не засорять систему можно воспользоваться `pipenv install --dev` и `pipenv run mypy .` соответственно.
-## Сервисы
+If you don't want to install dependencies in your system (good point) you can run checks in Docker or with project
+ dependency manager: `poetry install && poetry run mypy .`.
+ 
+## Services
 
 ### fetcher
-Сервис, просматривающий базу на наличие новых запросов и обрабатывающий их. Парсит ответ от непубличного GooglePlay 
-Store API, скачивает картинки-иконки блоков разрешений.
+Looks through database and wait for new app permissions requests, then processes theirs. Parses response from private
+ GooglePlay Store API, downloads icons for permission blocks.
 
 ### api
-Сервис, предоставляющий API для отправки в базу запроса и отдачу полученных результатов. Содержит один грустный 
-эндпоинт.
+Service-API which maintain permission requests via JSON requests API. Contains only one sad endpoint.
 
 ### frontend
-Мини-фронтенд на vue + semantic-ui. Делает запросы, крутит лоадингом, выводит разрешения. Раздаётся nginx'ом вместе с
- картинками блоков разрешений. Собирается в момент сборки докерфайла через docker multi-stage build
+Little frontend on vue + semantic-ui. Makes responses, spins loading, shows permissions. Distributed by nginx with
+ shared volume with permissions block icons. Building when Dockerfile builds within multi-stage build.
 
 ## TODO:
  - [ ] Фатальный недостаток в fetcher модуле, на который аж линтер ругается -- слишком сложный парсинг блоков разрешений
