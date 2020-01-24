@@ -25,6 +25,6 @@ async def get_permissions(permission_request: Dict[str, str]) -> Tuple[bool, dic
 
         application_data.pop('_id')
         return False, application_data
-    else:
-        await collection.insert_one(permission_request)
-        return False, {}
+
+    await collection.insert_one(permission_request)
+    return False, {}

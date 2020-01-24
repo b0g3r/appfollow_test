@@ -24,8 +24,7 @@ class PermissionRequest(Schema):
         url = request_data.get('url')
         if not url:
             raise ValidationError('"url" param must be set', ['url'])
-        params = dict(parse_qsl(urlparse(url).query))
-        return params
+        return dict(parse_qsl(urlparse(url).query))
 
     @validates('language')
     def _validate_language(self, language: Optional[str]):

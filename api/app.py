@@ -8,6 +8,10 @@ from marshmallow import ValidationError
 from db_utils import get_permissions
 from schemas import PermissionRequest
 
+HTTP202_STATUS_CODE = 202
+HTTP200_STATUS_CODE = 200
+HTTP400_STATUS_CODE = 400
+
 routes = web.RouteTableDef()
 
 
@@ -20,17 +24,17 @@ async def main_view(request: Request):
     try:
         permission_request = PermissionRequest().load(request_data)
     except ValidationError as errors:
-        return web.json_response({'errors': errors.messages}, status=400)
+        return web.json_response({'errors': errors.messages}, status=HTTP400_STATUS_CODE)
 
     error, permissions = await get_permissions(permission_request)
 
     if error:
-        return web.json_response({'errors': {'url': ['invalid url']}}, status=400)
+        return web.json_response({'errors': {'url': ['invalid url']}}, status=HTTP400_STATUS_CODE)
 
     if permissions is not None:
-        return web.json_response(permissions, status=200)
-    else:
-        return web.json_response({}, status=202)
+        return web.json_response(permissions, status=HTTP200_STATUS_CODE)
+
+    return web.json_response({}, status=HTTP202_STATUS_CODE)
 
 
 app = web.Application()
